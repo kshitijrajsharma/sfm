@@ -8,6 +8,6 @@ sudo apt install -y python3-venv
 
 Navigate to reactenv/bin 
 Hit source activate 
-Another Way ------
+------Another Way ------
 **create your virtual env **
 ** pip install -r requirements.txt **
