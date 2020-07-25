@@ -21,5 +21,6 @@ from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^api/users/$', views.Users_list),
+    re_path(r'^api/ROI/$', views.polygondivide),
     re_path(r'^api/users/( ? P[0-9]+)$', views.Users_detail),
 ]
