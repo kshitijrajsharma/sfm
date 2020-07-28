@@ -80,26 +80,6 @@ def polygon_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-    # elif request.method == 'PUT':
-    #     objid=objid
-    #     if(objid=='all'):
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     else:
-    #         User = ROI.objects.filter(objectid=objid)
-    #     serializer = ROISerializer(User, data=request.data,context={'request': request})
-    #     if serializer.is_valid():   
-    #         serializer.save()
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # elif request.method == 'DELETE':
-    #     if(objid=='all'):
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     else:
-    #         User = ROI.objects.filter(objectid=objid)
-    #     User.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['GET', 'POST'])
 def Users_list(request):
@@ -118,6 +98,26 @@ def Users_list(request):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# @api_view(['PUT', 'DELETE'])
+# def polygon_detail(request, pk):
+    
+
+#     if request.method == 'PUT':
+        
+#         newuser = ROI.objects.filter(objectid=pk)
+#         serializer = ROISerializer(newuser, data=request.data,context={'request': request})
+#         if serializer.is_valid():   
+#             serializer.save()
+#             return Response(status=status.HTTP_204_NO_CONTENT)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+        
+
+#     elif request.method == 'DELETE':
+       
+#         newuser = ROI.objects.filter(objectid=pk)
+#         newuser.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['PUT', 'DELETE'])
