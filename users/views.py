@@ -6,17 +6,18 @@ from django.db import connection
 from .models import User,ROI,ROI_DIVIDED
 from .serializers import *
 
-def polydivider()
+def polydivider(srid,id,noofpoly):
     cursor = connection.cursor()
-    cursor.execute("DROP TABLE IF EXISTS poly; CREATE TABLE poly AS SELECT * FROM users_roi ")
+    cursor.execute("DROP TABLE IF EXISTS poly; CREATE TABLE poly AS SELECT * FROM users_roi WHERE objectid = "+str(id)+" ")
     cursor.execute("DROP TABLE IF EXISTS poly_pts; CREATE TABLE poly_pts AS SELECT (ST_Dump(ST_GeneratePoints(geom, 2000))).geom AS geom FROM users_roi ")
-    cursor.execute("DROP TABLE IF EXISTS poly_pts_clustered;CREATE TABLE poly_pts_clustered AS SELECT geom, ST_ClusterKMeans(geom, 3) over () AS cluster FROM poly_pts;")
+    cursor.execute("DROP TABLE IF EXISTS poly_pts_clustered;CREATE TABLE poly_pts_clustered AS SELECT geom, ST_ClusterKMeans(geom, "+str(noofpoly)+") over () AS cluster FROM poly_pts;")
     cursor.execute("DROP TABLE IF EXISTS poly_centers; CREATE TABLE poly_centers AS SELECT cluster, ST_Centroid(ST_collect(geom)) AS geom FROM poly_pts_clustered GROUP BY cluster; ")
     cursor.execute("DROP TABLE IF EXISTS poly_voronoi; CREATE TABLE poly_voronoi AS SELECT (ST_Dump(ST_VoronoiPolygons(ST_collect(geom)))).geom AS geom FROM poly_centers; ")
     cursor.execute("DROP TABLE IF EXISTS poly_divided; CREATE TABLE poly_divided AS SELECT ST_Intersection(a.geom, b.geom) AS geom FROM users_roi a CROSS JOIN poly_voronoi b;")
     cursor.execute("Alter table  users_roi_divided alter column geom type geometry ( Polygon,4326)")
     cursor.execute("DELETE FROM users_roi_divided;")
-    cursor.execute("INSERT INTO users_roi_divided(geom) SELECT (geom) FROM poly_divided;")
+    cursor.execute("INSERT INTO users_roi_divided(geom,Area) SELECT geom,ST_Area(ST_Transform(geom,"+str(srid)+" )) FROM poly_divided;")
+   
 
 @api_view(['GET', 'POST'])
 def polygondivide(request):
@@ -24,7 +25,7 @@ def polygondivide(request):
         
 
         
-        polydivider()
+        polydivider(32644,1,3)
       
        
         
