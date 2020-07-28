@@ -17,10 +17,15 @@ from django.contrib import admin
 from django.urls import path, re_path
 from users import views
 from django.conf.urls import url
+from rest_framework import routers
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^api/users/$', views.Users_list),
-    re_path(r'^api/ROI/$', views.polygondivide),
-    re_path(r'^api/users/( ? P[0-9]+)$', views.Users_detail),
+    
+    path('api/ROI/',views.polygon_list),
+   
+    path('api/ROI/<slug:objid>/<slug:noofpoly>/<slug:localsrid>',views.polygondivide,name='polygondivide'),
+    path('api/users/<slug:pk>',views.Users_detail),
+    
 ]
