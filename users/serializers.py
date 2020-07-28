@@ -1,8 +1,13 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,ROI_DIVIDED
 
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User 
         fields = ('pk', 'name', 'email', 'document', 'phone', 'registrationDate')
+class ROISerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ROI_DIVIDED 
+        fields = '__all__'
