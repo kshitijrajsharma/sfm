@@ -1,4 +1,4 @@
-#!/home/kshitiz/environments/reactenv/bin/python3
+#!/home/sovastiwari/sfm/reactenv/bin/python3
 from django.core import management
 
 if __name__ == "__main__":
