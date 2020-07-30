@@ -3,13 +3,20 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db import connection
 from rest_framework import generics
+import geopandas as gp
+  
+from django.http import HttpResponse
 
 from django.shortcuts import render
-
+import geojson,gdal,subprocess
 from .models import User,ROI,ROI_DIVIDED
 from .serializers import *
 import shapely
-from shapely.geometry import MultiPolygon, Point, shape
+import itertools,requests
+import json
+
+import fiona
+from shapely.geometry import shape, mapping,MultiPolygon
 
 def polydivider(srid,id,noofpoly):
     cursor = connection.cursor()
@@ -26,28 +33,36 @@ def polydivider(srid,id,noofpoly):
 
 def polytoline(request):
     if request.method == 'GET':
-        vector = request.GET['vector']
-        remove()
-        data=geojson.loads(vector)
-        with open('data.geojson', 'w')as f:
-            geojson.dump(data,f) 
-        with open("data.geojson") as f:
-            features = json.load(f)["features"]
-            pols=shape(feature["geometry"])
-        lines=[]
-        for pol in pols:
-            boundary = pol.boundary
-            if boundary.type == 'MultiLineString':
-                for line in boundary:
-                    lines.append(line)
-            else:
-                lines.append(line)
-        for line in lines:
-            print (line.wkt)
-                      
-        args=['ogr2ogr','-f','ESRI Shapefile', "data/destination_data.shp",'data.geojson']
-        subprocess.Popen(args)
-        return HttpResponse('success' )
+        # url = request.GET['url']
+        url='http://127.0.0.1:8000/api/ROI/1/2/4326'
+        bufferlength=request.GET['bufferlength']
+
+        # vector = request.GET['vector']
+        # remove()
+        # data=geojson.loads(vector)
+        # with open('poly.geojson', 'w')as f:
+        #     geojson.dump(data,f)             
+        # args=['ogr2ogr','-f','ESRI Shapefile', "polygons.shp",'poly.geojson']
+        # subprocess.Popen(args)
+        r = requests.get(url)
+        apijson = r.json()
+        
+        with open('poly.geojson', 'w')as f:
+            json.dump(apijson,f) 
+        Multi = MultiPolygon([shape(poly['geometry']) for poly in fiona.open('poly.geojson')])
+        schema = {'geometry': 'LineString','properties': {'fireline': 'int'}}
+        with fiona.open('data/intersection.geojson','w','GeoJSON', schema) as e:
+            for i in  itertools.combinations(Multi, 2):
+                if i[0].touches(i[1]):
+                    e.write({'geometry':mapping(i[0].intersection(i[1])), 'properties':{'fireline':1}})
+        # args2=['ogr2ogr','-f','GeoJSON ', "data/intersection.geojson",'intersection.shp']
+        # subprocess.Popen(args2)
+        shp = r'data/intersection.geojson'
+        gdf = gp.GeoDataFrame.from_file(shp)
+        gdf['geometry'] = gdf.geometry.buffer(int(bufferlength),0)
+        gdf.to_file("data/output.geojson", driver="GeoJSON")
+
+        return HttpResponse('successful' )
     else:
         return HttpResponse("unsuccesful")
    

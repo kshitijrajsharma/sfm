@@ -12,14 +12,14 @@ class ROIdividedSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = ROI_DIVIDED 
         fields = '__all__'
-        geo_field = "geometry"
+        geo_field = "geom"
         auto_bbox = True
 class ROISerializer(GeoFeatureModelSerializer):
    
 
     class Meta:
         model = ROI 
-        geo_field = "geometry"
+        geo_field = "geom"
         fields = '__all__'
         auto_bbox = True
       

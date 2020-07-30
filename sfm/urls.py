@@ -24,6 +24,7 @@ urlpatterns = [
     re_path(r'^api/users/$', views.Users_list),
     
     path('api/ROI/',views.polygon_list),
+    
     # path('api/ROI/<slug:pk>',views.polygon_detail),
    
     path('api/ROI/<slug:objid>/<slug:noofpoly>/<slug:localsrid>',views.polygondivide,name='polygondivide'),
