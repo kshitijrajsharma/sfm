@@ -15,14 +15,14 @@ class User(models.Model):
 class ROI(models.Model):
     objectid = models.BigIntegerField(blank=True,null=True)
     name = models.CharField(max_length=100,default='Null')
-    geom = geomodels.GeometryField(srid=4326)
+    geometry = geomodels.GeometryField(srid=4326)
     class Meta:
         verbose_name_plural = "ROI"
 class ROI_DIVIDED(models.Model):
     objectid = models.BigIntegerField(blank=True,null=True)
     name = models.CharField(max_length=100,default='Null',null=True)
     
-    geom = geomodels.GeometryField(srid=4326)
+    geometry = geomodels.GeometryField(srid=4326)
     area = models.FloatField(max_length=100,null=True)
     class Meta:
         verbose_name_plural = "ROI_DIVIDED"
