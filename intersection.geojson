@@ -1,6 +1,6 @@
 {
 "type": "FeatureCollection",
 "features": [
-{ "type": "Feature", "properties": { "fireline": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 28.296512123190826, 83.659228652650597 ], [ 28.428414395944792, 83.574882125758336 ] ] } }
+{ "type": "Feature", "properties": { "fireline": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 28.29711284362422, 83.660030737428713 ], [ 28.428829541553199, 83.575659053407136 ] ] } }
 ]
 }

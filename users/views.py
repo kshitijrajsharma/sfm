@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db import connection
@@ -35,7 +36,8 @@ def polytoline(request):
     if request.method == 'GET':
         # url = request.GET['url']
         url='http://127.0.0.1:8000/api/ROI/1/2/4326'
-        bufferlength=request.GET['bufferlength']
+        
+        # bufferlength=request.GET['bufferlength']
 
         # vector = request.GET['vector']
         # remove()
@@ -51,18 +53,20 @@ def polytoline(request):
             json.dump(apijson,f) 
         Multi = MultiPolygon([shape(poly['geometry']) for poly in fiona.open('poly.geojson')])
         schema = {'geometry': 'LineString','properties': {'fireline': 'int'}}
-        with fiona.open('data/intersection.geojson','w','GeoJSON', schema) as e:
+        with fiona.open('intersection.geojson','w','GeoJSON', schema) as e:
             for i in  itertools.combinations(Multi, 2):
                 if i[0].touches(i[1]):
                     e.write({'geometry':mapping(i[0].intersection(i[1])), 'properties':{'fireline':1}})
         # args2=['ogr2ogr','-f','GeoJSON ', "data/intersection.geojson",'intersection.shp']
         # subprocess.Popen(args2)
-        shp = r'data/intersection.geojson'
+        shp = r'intersection.geojson'
         gdf = gp.GeoDataFrame.from_file(shp)
-        gdf['geometry'] = gdf.geometry.buffer(int(bufferlength),0)
-        gdf.to_file("data/output.geojson", driver="GeoJSON")
+        gdf['geometry'] = gdf.geometry.buffer(0.001,0)
+        gdf.to_file("output.geojson", driver="GeoJSON")
+        with open('output.geojson', 'r') as f:
+             my_json_obj = json.load(f)
 
-        return HttpResponse('successful' )
+        return JsonResponse(my_json_obj)
     else:
         return HttpResponse("unsuccesful")
    
