@@ -34,8 +34,8 @@ def polydivider(srid,id,noofpoly):
 
 def polytoline(request):
     if request.method == 'GET':
-        # url = request.GET['url']
-        url='http://127.0.0.1:8000/api/ROI/1/2/4326'
+        url = request.GET['url']
+        # url='http://127.0.0.1:8000/api/ROI/1/2/4326'
         
         # bufferlength=request.GET['bufferlength']
 
