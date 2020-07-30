@@ -35,17 +35,7 @@ def polydivider(srid,id,noofpoly):
 def polytoline(request):
     if request.method == 'GET':
         url = request.GET['url']
-        # url='http://127.0.0.1:8000/api/ROI/1/2/4326'
-        
-        # bufferlength=request.GET['bufferlength']
-
-        # vector = request.GET['vector']
-        # remove()
-        # data=geojson.loads(vector)
-        # with open('poly.geojson', 'w')as f:
-        #     geojson.dump(data,f)             
-        # args=['ogr2ogr','-f','ESRI Shapefile', "polygons.shp",'poly.geojson']
-        # subprocess.Popen(args)
+       
         r = requests.get(url)
         apijson = r.json()
         
@@ -57,8 +47,7 @@ def polytoline(request):
             for i in  itertools.combinations(Multi, 2):
                 if i[0].touches(i[1]):
                     e.write({'geometry':mapping(i[0].intersection(i[1])), 'properties':{'fireline':1}})
-        # args2=['ogr2ogr','-f','GeoJSON ', "data/intersection.geojson",'intersection.shp']
-        # subprocess.Popen(args2)
+       
         shp = r'intersection.geojson'
         gdf = gp.GeoDataFrame.from_file(shp)
         gdf['geometry'] = gdf.geometry.buffer(0.001,0)
@@ -89,14 +78,6 @@ def polygondivide(request,objid,noofpoly,localsrid):
         return Response(serializer.data)
   
 
-
-    # elif request.method == 'POST':
-    #     serializer = ROIdividedSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(status=status.HTTP_201_CREATED)
-            
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'POST'])
 def polygon_list(request):
@@ -135,27 +116,6 @@ def Users_list(request):
             return Response(status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['PUT', 'DELETE'])
-# def polygon_detail(request, pk):
-    
-
-#     if request.method == 'PUT':
-        
-#         newuser = ROI.objects.filter(objectid=pk)
-#         serializer = ROISerializer(newuser, data=request.data,context={'request': request})
-#         if serializer.is_valid():   
-#             serializer.save()
-#             return Response(status=status.HTTP_204_NO_CONTENT)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-       
-        
-
-#     elif request.method == 'DELETE':
-       
-#         newuser = ROI.objects.filter(objectid=pk)
-#         newuser.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['PUT', 'DELETE'])
