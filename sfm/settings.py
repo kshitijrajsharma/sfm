@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'users',
     'import_export',
+    'rest_framework_gis',
     
     
 ]

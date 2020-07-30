@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User,ROI_DIVIDED,ROI
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -11,8 +12,9 @@ class ROIdividedSerializer(serializers.ModelSerializer):
     class Meta:
         model = ROI_DIVIDED 
         fields = '__all__'
-class ROISerializer(serializers.ModelSerializer):
+class ROISerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = ROI 
+        geo_field = "geom"
         fields = '__all__'
