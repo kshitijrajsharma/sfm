@@ -28,5 +28,6 @@ urlpatterns = [
    
     path('api/ROI/<slug:objid>/<slug:noofpoly>/<slug:localsrid>',views.polygondivide,name='polygondivide'),
     path('api/users/<slug:pk>',views.Users_detail),
+    path('api/polytoline/',views.polytoline,name='vector'),
     
 ]

@@ -8,6 +8,8 @@ from django.shortcuts import render
 
 from .models import User,ROI,ROI_DIVIDED
 from .serializers import *
+import shapely
+from shapely.geometry import MultiPolygon, Point, shape
 
 def polydivider(srid,id,noofpoly):
     cursor = connection.cursor()
@@ -22,7 +24,32 @@ def polydivider(srid,id,noofpoly):
     cursor.execute("INSERT INTO users_roi_divided(geom,Area) SELECT geom,ST_Area(ST_Transform(geom,"+str(srid)+" )) FROM poly_divided;")
     cursor.execute("UPDATE users_roi_divided SET objectid="+str(id)+"")
 
-
+def polytoline(request):
+    if request.method == 'GET':
+        vector = request.GET['vector']
+        remove()
+        data=geojson.loads(vector)
+        with open('data.geojson', 'w')as f:
+            geojson.dump(data,f) 
+        with open("data.geojson") as f:
+            features = json.load(f)["features"]
+            pols=shape(feature["geometry"])
+        lines=[]
+        for pol in pols:
+            boundary = pol.boundary
+            if boundary.type == 'MultiLineString':
+                for line in boundary:
+                    lines.append(line)
+            else:
+                lines.append(line)
+        for line in lines:
+            print (line.wkt)
+                      
+        args=['ogr2ogr','-f','ESRI Shapefile', "data/destination_data.shp",'data.geojson']
+        subprocess.Popen(args)
+        return HttpResponse('success' )
+    else:
+        return HttpResponse("unsuccesful")
    
 
 @api_view(['GET'])
@@ -34,14 +61,6 @@ def polygondivide(request,objid,noofpoly,localsrid):
         polydivider(localsrid,objid,noofpoly)
     except:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    
-   
-            
-            
-
-    
 
     if request.method == 'GET':
         
