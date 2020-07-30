@@ -1,12 +1,19 @@
-import React, { Component } from "react";
-import { Table } from "reactstrap";
-import NewuserModal from "./NewUserModal";
+import React, { Component } from 'react';
+import { Table } from 'reactstrap';
+import PropTypes from 'prop-types';
+import NewuserModal from './NewUserModal';
 
-import ConfirmRemovalModal from "./ConfirmRemovalModal ";
+import ConfirmRemovalModal from './ConfirmRemovalModal ';
 
 class UserList extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {};
+  }
+
   render() {
-    const users = this.props.users;
+    const { users, resetState } = this.props;
     return (
       <Table dark>
         <thead>
@@ -16,7 +23,6 @@ class UserList extends Component {
             <th>Document</th>
             <th>Phone</th>
             <th>Registration</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -27,7 +33,7 @@ class UserList extends Component {
               </td>
             </tr>
           ) : (
-            users.map(user => (
+            users.map((user) => (
               <tr key={user.pk}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
@@ -35,16 +41,9 @@ class UserList extends Component {
                 <td>{user.phone}</td>
                 <td>{user.registrationDate}</td>
                 <td align="center">
-                  <NewuserModal
-                    create={false}
-                    user={user}
-                    resetState={this.props.resetState}
-                  />
+                  <NewuserModal create={false} user={user} resetState={resetState} />
                   &nbsp;&nbsp;
-                  <ConfirmRemovalModal
-                    pk={user.pk}
-                    resetState={this.props.resetState}
-                  />
+                  <ConfirmRemovalModal pk={user.pk} resetState={resetState} />
                 </td>
               </tr>
             ))
@@ -54,5 +53,8 @@ class UserList extends Component {
     );
   }
 }
-
+UserList.propTypes = {
+  users: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  resetState: PropTypes.func.isRequired,
+};
 export default UserList;

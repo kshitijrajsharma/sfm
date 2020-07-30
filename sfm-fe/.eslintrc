@@ -1,0 +1,20 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier", "prettier/react"],
+  "plugins": ["prettier"],
+  "env": {
+    "browser": true
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack.base.config.js"
+      }
+    }
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "off",
+    "react/jsx-props-no-spreading": ["error", { "custom": "ignore" }]
+  }
+}
