@@ -7,11 +7,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
         fields = ('pk', 'name', 'email', 'document', 'phone', 'registrationDate')
-class ROIdividedSerializer(serializers.ModelSerializer):
+class ROIdividedSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = ROI_DIVIDED 
         fields = '__all__'
+        geo_field = "geom"
 class ROISerializer(GeoFeatureModelSerializer):
 
     class Meta:
