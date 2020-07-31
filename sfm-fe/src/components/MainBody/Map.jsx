@@ -122,9 +122,9 @@ class Maps extends Component {
 
         const myLayerOptions = {
           pointToLayer: createIcons,
-          onEachFeature: function onEachFeature(feature, layer) {
-            layer.bindPopup(`<p>Name: ${feature.properties.Name}</p>`);
-          },
+          // onEachFeature: function onEachFeature(feature, layer) {
+          //   layer.bindPopup(`<p>Name: ${feature.properties.Name}</p>`);
+          // },
         };
         const pointLayers = L.geoJSON(geojsonCsvData, myLayerOptions).addTo(map);
         previousGeojsonCsvLayer = geojsonCsvData;
@@ -138,10 +138,10 @@ class Maps extends Component {
         const myLayer = L.geoJSON(geojsonClusters, {
           style: {
             color: '#ffffff',
-            fillcolor: '#05b08c',
+            fillColor: '#05b08c',
             fillOpacity: 0.9,
             weight: 2,
-            opacity: 1,
+            // opacity: 1,
           },
           onEachFeature: function onEachFeature(feature, layer) {
             layer.bindPopup(`<p>AREA : ${feature.properties.area} Square Meter</p>`);
@@ -153,7 +153,7 @@ class Maps extends Component {
             layer.on('mouseout', function mouseOutFunction() {
               this.setStyle({
                 fillOpacity: 0.9,
-                fillColor: '#05b08c',
+                // fillColor: '#05b08c',
               });
             });
             layer.bindTooltip(String(feature.properties.pk), {
@@ -185,7 +185,7 @@ class Maps extends Component {
     if (prevProps.bufferGeojosn !== bufferGeojosn) {
       bufferGeojosn.features.map((buffered) => {
         const myStyle = {
-          color: '#ff7800',
+          color: '#c02137',
           fillcolor: '#ff7800',
           weight: 2,
           opacity: 1,
