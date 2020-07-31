@@ -34,11 +34,12 @@ def polydivider(srid,id,noofpoly):
 
 def polytoline(request):
     if request.method == 'GET':
-        incomingapi = request.GET['url']
+        incomingapi = request.GET['data']
+        print(incomingapi)
         bufferline= request.GET['bufferlength']
         incomingbuffer=float(bufferline)
         # print(incomingbuffer)
-        incomingurl=str(incomingapi)
+        # incomingurl=str(incomingapi)
         # print (incomingurl)
         
 
@@ -46,10 +47,10 @@ def polytoline(request):
         # print("this is inside the get request")
         
        
-        r = requests.get(incomingurl)
-        apijson = r.json()
+        # r = requests.get(incomingurl)
+        apijson = json.loads(incomingapi)
         # print('i am from incoming api')
-        # print(apijson)
+        print(apijson)
         
         with open('poly.geojson', 'w')as f:
             json.dump(apijson,f) 
