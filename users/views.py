@@ -37,9 +37,9 @@ def polytoline(request):
         incomingapi = request.GET['url']
         bufferline= request.GET['bufferlength']
         incomingbuffer=float(bufferline)
-        print(incomingbuffer)
+        # print(incomingbuffer)
         incomingurl=str(incomingapi)
-        print (incomingurl)
+        # print (incomingurl)
         
 
         # incomingurl='http://127.0.0.1:8000/api/ROI/4/4/4326'
@@ -48,6 +48,8 @@ def polytoline(request):
        
         r = requests.get(incomingurl)
         apijson = r.json()
+        # print('i am from incoming api')
+        # print(apijson)
         
         with open('poly.geojson', 'w')as f:
             json.dump(apijson,f) 
@@ -59,11 +61,18 @@ def polytoline(request):
                     e.write({'geometry':mapping(i[0].intersection(i[1])), 'properties':{'fireline':1}})
        
         shp = r'intersection.geojson'
+
+        # with open('intersection.geojson', 'r') as f:
+         #    intersection_obj = json.load(f)
+        # print("i am from intersection shp")
+        # print(intersection_obj)
+        # print(incomingbuffer)
         gdf = gp.GeoDataFrame.from_file(shp)
         gdf['geometry'] = gdf.geometry.buffer(incomingbuffer,0)
         gdf.to_file("output.geojson", driver="GeoJSON")
         with open('output.geojson', 'r') as f:
              my_json_obj = json.load(f)
+        # print(my_json_obj)
 
         return JsonResponse(my_json_obj)
     else:

@@ -252,12 +252,12 @@ class MainComponent extends Component {
   generateFireLineBuffer = () => {
     console.log('generated');
     const { clusterUrl, allDatas } = this.state;
-    const { numberValue } = allDatas;
+    const { bufferWidth } = allDatas;
     let bufferValue = 0;
-    if (numberValue === '4meter') {
+    if (bufferWidth === '4meter') {
       bufferValue = 1 / 1000;
     }
-    if (numberValue === '6meter') {
+    if (bufferWidth === '6meter') {
       bufferValue = 3 / 1000;
     }
 
@@ -294,11 +294,9 @@ class MainComponent extends Component {
       createClicked,
       generatePolygon,
       firstList,
-      clusterUrl,
       bufferGeojosn,
     } = this.state;
     const OverlayItems = ['Legend', 'Measure', 'Export'];
-    console.log(clusterUrl);
 
     return (
       <body className="main-body">
