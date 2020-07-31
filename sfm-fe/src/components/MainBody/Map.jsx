@@ -39,7 +39,7 @@ class Maps extends Component {
     const myMap = L.map(this.mapRef.current, {
       center: [28.170644, 84.19379],
       zoom: 7,
-      minZoom: 6.5,
+      // minZoom: 6.5,
       layers: [hybrid],
     });
 
@@ -77,6 +77,7 @@ class Maps extends Component {
       geojsonCsvData,
       geojsonClusters,
       allDatas,
+      bufferGeojosn,
     } = this.props;
     const { map, editableLayers } = this.state;
 
@@ -164,6 +165,13 @@ class Maps extends Component {
     }
     if (prevProps.createClicked !== createClicked) {
       this.drawMeasure(map, editableLayers, 'measureArea');
+    }
+    if (prevProps.bufferGeojosn !== bufferGeojosn) {
+      bufferGeojosn.features.map((buffered) => {
+        console.log(buffered);
+        L.geoJSON(buffered).addTo(map);
+        return true;
+      });
     }
   }
 
@@ -266,5 +274,6 @@ Maps.propTypes = {
   geojsonCsvData: PropTypes.oneOfType([PropTypes.object]).isRequired,
   geojsonClusters: PropTypes.oneOfType([PropTypes.object]).isRequired,
   allDatas: PropTypes.oneOfType(PropTypes.object).isRequired,
+  bufferGeojosn: PropTypes.oneOfType([PropTypes.object]).isRequired,
 };
 export default Maps;

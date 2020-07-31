@@ -113,7 +113,8 @@ class MenuModal extends Component {
   };
 
   generateFireLines = () => {
-    console.log('firelines Generated');
+    const { generateFireLineBuffer } = this.props;
+    generateFireLineBuffer();
     this.setState(() => ({
       fifthList: true,
     }));
@@ -206,6 +207,7 @@ class MenuModal extends Component {
 }
 MenuModal.propTypes = {
   handleCloseFunction: PropTypes.func.isRequired,
+  generateFireLineBuffer: PropTypes.func.isRequired,
   firstListProps: PropTypes.bool.isRequired,
   createPolygon: PropTypes.func.isRequired,
   callResetFunction: PropTypes.func.isRequired,

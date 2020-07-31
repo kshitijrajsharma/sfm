@@ -34,9 +34,19 @@ def polydivider(srid,id,noofpoly):
 
 def polytoline(request):
     if request.method == 'GET':
-        url = request.GET['url']
+        incomingapi = request.GET['url']
+        bufferline= request.GET['bufferlength']
+        incomingbuffer=float(bufferline)
+        print(incomingbuffer)
+        incomingurl=str(incomingapi)
+        print (incomingurl)
+        
+
+        # incomingurl='http://127.0.0.1:8000/api/ROI/4/4/4326'
+        # print("this is inside the get request")
+        
        
-        r = requests.get(url)
+        r = requests.get(incomingurl)
         apijson = r.json()
         
         with open('poly.geojson', 'w')as f:
@@ -50,7 +60,7 @@ def polytoline(request):
        
         shp = r'intersection.geojson'
         gdf = gp.GeoDataFrame.from_file(shp)
-        gdf['geometry'] = gdf.geometry.buffer(0.001,0)
+        gdf['geometry'] = gdf.geometry.buffer(incomingbuffer,0)
         gdf.to_file("output.geojson", driver="GeoJSON")
         with open('output.geojson', 'r') as f:
              my_json_obj = json.load(f)
