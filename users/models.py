@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models as geomodels
+import uuid
 
 
 # Create your models here.
@@ -21,7 +22,7 @@ class ROI(models.Model):
 class ROI_DIVIDED(models.Model):
     objectid = models.BigIntegerField(blank=True,null=True)
     name = models.CharField(max_length=100,default='Null',null=True)
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     geom = geomodels.GeometryField(srid=4326)
     area = models.FloatField(max_length=100,null=True)
     class Meta:

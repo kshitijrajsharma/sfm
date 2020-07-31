@@ -136,8 +136,15 @@ class Maps extends Component {
     if (prevProps.geojsonClusters !== geojsonClusters) {
       if (geojsonClusters) {
         const myLayer = L.geoJSON(geojsonClusters, {
+          style: {
+            color: '#ffffff',
+            fillcolor: '#05b08c',
+            fillOpacity: 0.9,
+            weight: 2,
+            opacity: 1,
+          },
           onEachFeature: function onEachFeature(feature, layer) {
-            layer.bindPopup(`<p>Id: ${feature.properties.objectid}</p>`);
+            layer.bindPopup(`<p>AREA : ${feature.properties.area} Square Meter</p>`);
             layer.on('mouseover', function mouseOverFunction() {
               this.setStyle({
                 fillOpacity: 0,
@@ -145,8 +152,13 @@ class Maps extends Component {
             });
             layer.on('mouseout', function mouseOutFunction() {
               this.setStyle({
-                fillOpacity: 0.3,
+                fillOpacity: 0.9,
+                fillColor: '#05b08c',
               });
+            });
+            layer.bindTooltip(String(feature.properties.pk), {
+              permanent: true,
+              direction: 'center',
             });
           },
         }).addTo(map);
