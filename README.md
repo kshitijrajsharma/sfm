@@ -1,12 +1,12 @@
 You Should Have :
 
--Python 3 (if you’re using Linux, chances are that it’s already installed. Run python3 -V command to check)
+------Python 3 (if you’re using Linux, chances are that it’s already installed. Run python3 -V command to check)
 
--Pip (the default Python package installer)
+-----Pip (the default Python package installer)
 
--NodeJS(in a version 6 or plus) and npm (5.2+)
+-----NodeJS(in a version 6 or plus) and npm (5.2+)
 
--Postgresql 10  with PostGIS extension
+-----Postgresql 10  with PostGIS extension
 
 Follow These Step to setup the project : 
 
@@ -28,7 +28,7 @@ Run these command on terminal
  REMEMBER : 
  >>>>>>>This Project uses Postgresql with postgis extension enabled
  >>>>>>>Hence make sure you installed postgresql 10 and created database named "sfm" with postgis extension enabled 
- >>>>>>> You can edit your username and password on settings.py file ( Default is username: 'postgres' and password: 'admin')
+ >>>>>>> You can edit your username and password on settings.py file ( Default ::: username: 'postgres' and password: 'admin')
 
 
 AFTER YOU INITIALIZED DATABASE AND INSTALLED ALL LIBRARIES HIT THESE COMMANDS : 
