@@ -5,7 +5,7 @@ import Map from './Map';
 import MenuModal from '../Models/MenuModal';
 import Settings from '../Models/Settings';
 import MainHeader from '../PageContents/MainHeader';
-import { ROI_API } from '../../constants';
+import { ROI_API, FIRE_LINE } from '../../constants';
 
 class MainComponent extends Component {
   constructor(props) {
@@ -26,6 +26,8 @@ class MainComponent extends Component {
       allPolygonsData: [],
       dataId: 0,
       firstList: false,
+      clusterUrl: '',
+      bufferGeojosn: {},
     };
     this.menuRef = createRef();
   }
@@ -170,6 +172,7 @@ class MainComponent extends Component {
         Axios.get(`${ROI_API}${dataId}/${numberValue}/${epsgSelected}`).then((res) => {
           this.setState(() => ({
             geojsonClusters: res.data,
+            clusterUrl: `${ROI_API}${dataId}/${numberValue}/${epsgSelected}`,
           }));
         });
       } else if (allDatas && areaValue) {
@@ -185,6 +188,7 @@ class MainComponent extends Component {
         Axios.get(`${ROI_API}${dataId}/${newNumber}/${epsgSelected}`).then((res) => {
           this.setState(() => ({
             geojsonClusters: res.data,
+            clusterUrl: `${ROI_API}${dataId}/${numberValue}/${epsgSelected}`,
           }));
         });
       }
@@ -245,6 +249,36 @@ class MainComponent extends Component {
     }));
   };
 
+  generateFireLineBuffer = () => {
+    console.log('generated');
+    const { clusterUrl, allDatas } = this.state;
+    const { bufferWidth } = allDatas;
+    let bufferValue = 0;
+    if (bufferWidth === '4meter') {
+      bufferValue = 1 / 1000;
+    }
+    if (bufferWidth === '6meter') {
+      bufferValue = 3 / 1000;
+    }
+
+    Axios.get(
+      FIRE_LINE,
+      {
+        params: {
+          url: clusterUrl,
+          bufferlength: `${bufferValue}`,
+        },
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    ).then((res) => {
+      this.setState(() => ({
+        bufferGeojosn: res.data,
+      }));
+    });
+  };
+
   render() {
     const {
       menuShow,
@@ -260,6 +294,7 @@ class MainComponent extends Component {
       createClicked,
       generatePolygon,
       firstList,
+      bufferGeojosn,
     } = this.state;
     const OverlayItems = ['Legend', 'Measure', 'Export'];
 
@@ -283,6 +318,7 @@ class MainComponent extends Component {
             createClicked={createClicked}
             generatePolygon={generatePolygon}
             generateClose={this.generateClose}
+            bufferGeojosn={bufferGeojosn}
           />
           <div className="overlay-container-div">
             <ul className="overlay-list">
@@ -351,6 +387,7 @@ class MainComponent extends Component {
             callResetFunction={this.callResetFunction}
             firstListProps={firstList}
             allDatas={allDatas}
+            generateFireLineBuffer={this.generateFireLineBuffer}
           />
         )}
         {settingModal && (
