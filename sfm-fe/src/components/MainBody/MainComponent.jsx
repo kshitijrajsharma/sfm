@@ -251,21 +251,21 @@ class MainComponent extends Component {
 
   generateFireLineBuffer = () => {
     console.log('generated');
-    const { clusterUrl, allDatas } = this.state;
+    const { geojsonClusters, allDatas } = this.state;
     const { bufferWidth } = allDatas;
     let bufferValue = 0;
     if (bufferWidth === '4meter') {
-      bufferValue = 1 / 1000;
+      bufferValue = 2 / 100000;
     }
     if (bufferWidth === '6meter') {
-      bufferValue = 3 / 1000;
+      bufferValue = 3 / 100000;
     }
 
     Axios.get(
       FIRE_LINE,
       {
         params: {
-          url: clusterUrl,
+          data: JSON.stringify(geojsonClusters),
           bufferlength: `${bufferValue}`,
         },
       },
@@ -295,8 +295,10 @@ class MainComponent extends Component {
       generatePolygon,
       firstList,
       bufferGeojosn,
+      clusterUrl,
     } = this.state;
     const OverlayItems = ['Legend', 'Measure', 'Export'];
+    console.log(clusterUrl);
 
     return (
       <body className="main-body">

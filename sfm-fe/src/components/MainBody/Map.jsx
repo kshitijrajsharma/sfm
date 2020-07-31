@@ -39,7 +39,8 @@ class Maps extends Component {
     const myMap = L.map(this.mapRef.current, {
       center: [28.170644, 84.19379],
       zoom: 7,
-      // minZoom: 6.5,
+      minZoom: 6.5,
+      maxZoom: 25,
       layers: [hybrid],
     });
 
