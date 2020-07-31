@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Nepal 1981",
+    "EPSG": "6207"
+  },
+  {
+    "name": "WGS 84 / UTM zone 45N",
+    "EPSG": "32645"
+  },
+  {
+    "name": "WGS 84 / UTM zone 44N",
+    "EPSG": "32644"
+  },
+  {
+    "name": "WGS 84",
+    "EPSG": "4326"
+  },
+  {
+    "name": "ITRF2014",
+    "EPSG": "7789"
+  },
+  {
+    "name": "IGS08",
+    "EPSG": "6934"
+  }
+]

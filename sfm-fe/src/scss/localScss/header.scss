@@ -1,0 +1,41 @@
+.main-header {
+  width: calc(100% - 4px);
+  height: 60px;
+  background-image: linear-gradient(#0ec076, #02ab94);
+  margin: 2px;
+  div {
+    padding: 10px 40px 0px 40px;
+    float: left;
+    .tree-icon {
+      height: 50px;
+      width: auto;
+      text-align: center;
+      padding-right: 30px;
+    }
+    span {
+      font-size: 20px;
+      font-weight: 550;
+      cursor: pointer;
+      color: white;
+    }
+  }
+  .tabs-wrapper {
+    float: right;
+    padding: 10px 40px 0px 40px;
+    .tabs {
+      list-style: none;
+      display: flex;
+      li {
+        cursor: pointer;
+        margin: 5px;
+        padding: 5px 20px;
+        font-size: 17px;
+        text-align: center;
+        color: white;
+        &:hover {
+          color: #383e56;
+        }
+      }
+    }
+  }
+}
