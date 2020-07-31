@@ -1,13 +1,23 @@
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db import connection
 from rest_framework import generics
+import geopandas as gp
+  
+from django.http import HttpResponse
 
 from django.shortcuts import render
-
+import geojson,gdal,subprocess
 from .models import User,ROI,ROI_DIVIDED
 from .serializers import *
+import shapely
+import itertools,requests
+import json
+
+import fiona
+from shapely.geometry import shape, mapping,MultiPolygon
 
 def polydivider(srid,id,noofpoly):
     cursor = connection.cursor()
@@ -22,7 +32,32 @@ def polydivider(srid,id,noofpoly):
     cursor.execute("INSERT INTO users_roi_divided(geom,Area) SELECT geom,ST_Area(ST_Transform(geom,"+str(srid)+" )) FROM poly_divided;")
     cursor.execute("UPDATE users_roi_divided SET objectid="+str(id)+"")
 
+def polytoline(request):
+    if request.method == 'GET':
+        url = request.GET['url']
+       
+        r = requests.get(url)
+        apijson = r.json()
+        
+        with open('poly.geojson', 'w')as f:
+            json.dump(apijson,f) 
+        Multi = MultiPolygon([shape(poly['geometry']) for poly in fiona.open('poly.geojson')])
+        schema = {'geometry': 'LineString','properties': {'fireline': 'int'}}
+        with fiona.open('intersection.geojson','w','GeoJSON', schema) as e:
+            for i in  itertools.combinations(Multi, 2):
+                if i[0].touches(i[1]):
+                    e.write({'geometry':mapping(i[0].intersection(i[1])), 'properties':{'fireline':1}})
+       
+        shp = r'intersection.geojson'
+        gdf = gp.GeoDataFrame.from_file(shp)
+        gdf['geometry'] = gdf.geometry.buffer(0.001,0)
+        gdf.to_file("output.geojson", driver="GeoJSON")
+        with open('output.geojson', 'r') as f:
+             my_json_obj = json.load(f)
 
+        return JsonResponse(my_json_obj)
+    else:
+        return HttpResponse("unsuccesful")
    
 
 @api_view(['GET'])
@@ -35,14 +70,6 @@ def polygondivide(request,objid,noofpoly,localsrid):
     except:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-    
-   
-            
-            
-
-    
-
     if request.method == 'GET':
         
         data = ROI_DIVIDED.objects.all()
@@ -51,14 +78,6 @@ def polygondivide(request,objid,noofpoly,localsrid):
         return Response(serializer.data)
   
 
-
-    # elif request.method == 'POST':
-    #     serializer = ROIdividedSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(status=status.HTTP_201_CREATED)
-            
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'POST'])
 def polygon_list(request):
@@ -97,27 +116,6 @@ def Users_list(request):
             return Response(status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['PUT', 'DELETE'])
-# def polygon_detail(request, pk):
-    
-
-#     if request.method == 'PUT':
-        
-#         newuser = ROI.objects.filter(objectid=pk)
-#         serializer = ROISerializer(newuser, data=request.data,context={'request': request})
-#         if serializer.is_valid():   
-#             serializer.save()
-#             return Response(status=status.HTTP_204_NO_CONTENT)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-       
-        
-
-#     elif request.method == 'DELETE':
-       
-#         newuser = ROI.objects.filter(objectid=pk)
-#         newuser.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['PUT', 'DELETE'])
