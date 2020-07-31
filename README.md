@@ -23,3 +23,4 @@ Run these command on terminal
 Now navigate to this repo and hit following command
 
 1. Python manage.py runserver 
+2. Navigate to node_modules and hit "npm install " & "npm start"
