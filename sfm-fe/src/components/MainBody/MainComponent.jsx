@@ -17,10 +17,10 @@ class MainComponent extends Component {
       legendContainer: false,
       exportMap: false,
       paramsMeasure: '',
-      geojsonData: null,
-      geojsonCsvData: null,
+      geojsonData: {},
+      geojsonCsvData: {},
       settingModal: false,
-      allDatas: null,
+      allDatas: {},
       createClicked: false,
       generatePolygon: false,
       allPolygonsData: [],
@@ -28,6 +28,7 @@ class MainComponent extends Component {
       firstList: false,
       clusterUrl: '',
       bufferGeojosn: {},
+      geojsonClusters: {},
     };
     this.menuRef = createRef();
   }
@@ -116,7 +117,7 @@ class MainComponent extends Component {
 
   getGeojsonData = (geojson) => {
     const { allPolygonsData } = this.state;
-    const dataId = allPolygonsData.features.length + 1;
+    const dataId = allPolygonsData && allPolygonsData.features.length + 1;
     Axios.post(
       ROI_API,
       {
@@ -206,7 +207,7 @@ class MainComponent extends Component {
 
   generateClose = (geojson) => {
     const { allPolygonsData } = this.state;
-    const dataId = allPolygonsData.features.length + 1;
+    const dataId = allPolygonsData && allPolygonsData.features.length + 1;
     Axios.post(
       ROI_API,
       {
@@ -316,7 +317,6 @@ class MainComponent extends Component {
             geojsonData={geojsonData}
             exportMap={exportMap}
             geojsonClusters={geojsonClusters}
-            allDatas={allDatas}
             createClicked={createClicked}
             generatePolygon={generatePolygon}
             generateClose={this.generateClose}

@@ -11,6 +11,7 @@ let previousLayer = null;
 let previousGeojsonLayer = null;
 let previousClustered = null;
 let previousGeojsonCsvLayer = null;
+let previousCreateLayer = null;
 
 class Maps extends Component {
   constructor(props) {
@@ -77,7 +78,6 @@ class Maps extends Component {
       createClicked,
       geojsonCsvData,
       geojsonClusters,
-      allDatas,
       bufferGeojosn,
     } = this.props;
     const { map, editableLayers } = this.state;
@@ -134,25 +134,18 @@ class Maps extends Component {
       }
     }
     if (prevProps.geojsonClusters !== geojsonClusters) {
-      console.log(allDatas);
       if (geojsonClusters) {
         const myLayer = L.geoJSON(geojsonClusters, {
           onEachFeature: function onEachFeature(feature, layer) {
             layer.bindPopup(`<p>Id: ${feature.properties.objectid}</p>`);
             layer.on('mouseover', function mouseOverFunction() {
               this.setStyle({
-                color: '#e80000',
-                fillColor: '#f7f2f3',
-                weight: 5,
-                opacity: 1,
+                fillOpacity: 0,
               });
             });
             layer.on('mouseout', function mouseOutFunction() {
               this.setStyle({
-                color: '#e80000',
-                fillColor: '#f7f2f3',
-                weight: 5,
-                opacity: 0,
+                fillOpacity: 0.3,
               });
             });
           },
@@ -160,17 +153,34 @@ class Maps extends Component {
         previousClustered = geojsonClusters;
         map.fitBounds(myLayer.getBounds());
         map.removeLayer(previousGeojsonLayer);
+        if (previousCreateLayer) {
+          map.removeLayer(previousCreateLayer);
+        }
       } else {
         map.removeLayer(previousClustered);
       }
     }
     if (prevProps.createClicked !== createClicked) {
+      if (previousCreateLayer) {
+        editableLayers.removeLayer(previousCreateLayer);
+        map.removeLayer(previousCreateLayer);
+        if (previousGeojsonLayer) {
+          map.removeLayer(previousGeojsonLayer);
+        }
+      }
       this.drawMeasure(map, editableLayers, 'measureArea');
     }
     if (prevProps.bufferGeojosn !== bufferGeojosn) {
       bufferGeojosn.features.map((buffered) => {
-        console.log(buffered);
-        L.geoJSON(buffered).addTo(map);
+        const myStyle = {
+          color: '#ff7800',
+          fillcolor: '#ff7800',
+          weight: 2,
+          opacity: 1,
+        };
+        L.geoJSON(buffered, {
+          style: myStyle,
+        }).addTo(map);
         return true;
       });
     }
@@ -186,18 +196,21 @@ class Maps extends Component {
     map.on(L.Draw.Event.CREATED, function drawAdd(e) {
       const layers = e.layer;
       const type = e.layerType;
-      previousLayer = layers;
       editableLayers.addLayer(layers);
+      console.log(generatePolygon, 'generatePolygon');
       if (generatePolygon) {
         const collection = layers.toGeoJSON();
         generateClose(collection);
+        previousCreateLayer = layers;
       }
-      if (type === 'polygon') {
+      if (!generatePolygon && type === 'polygon') {
+        previousLayer = layers;
         const seeArea = L.GeometryUtil.geodesicArea(layers.getLatLngs()[0]);
         console.log(seeArea);
       }
       // eslint-disable-next-line no-constant-condition
-      if (type === 'line' || 'polyline') {
+      if ((!generatePolygon && type === 'line') || 'polyline') {
+        previousLayer = layers;
         const seeArea = L.GeometryUtil.geodesicArea(layers.getLatLngs()[0]);
         console.log(seeArea);
       }
@@ -274,7 +287,6 @@ Maps.propTypes = {
   geojsonData: PropTypes.oneOfType([PropTypes.object]).isRequired,
   geojsonCsvData: PropTypes.oneOfType([PropTypes.object]).isRequired,
   geojsonClusters: PropTypes.oneOfType([PropTypes.object]).isRequired,
-  allDatas: PropTypes.oneOfType(PropTypes.object).isRequired,
   bufferGeojosn: PropTypes.oneOfType([PropTypes.object]).isRequired,
 };
 export default Maps;

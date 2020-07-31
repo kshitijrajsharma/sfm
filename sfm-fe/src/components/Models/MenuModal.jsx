@@ -153,7 +153,7 @@ class MenuModal extends Component {
               <li role="presentation" onClick={this.handleRequirement}>
                 3. Fill your Requirements
               </li>
-              {allDatas && <i className="material-icons icons-checked">check_circle</i>}
+              {Object.keys(allDatas).length !== 0 && <i className="material-icons icons-checked">check_circle</i>}
               <span>
                 <i className="material-icons">keyboard_backspace</i>
               </span>
@@ -216,6 +216,6 @@ MenuModal.propTypes = {
   getGeojsonData: PropTypes.func.isRequired,
   getGeojsonCsvData: PropTypes.func.isRequired,
   menuRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.object })]).isRequired,
-  allDatas: PropTypes.oneOfType(PropTypes.object).isRequired,
+  allDatas: PropTypes.oneOfType([PropTypes.object]).isRequired,
 };
 export default MenuModal;
