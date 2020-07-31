@@ -191,7 +191,7 @@ class Settings extends Component {
                       name="type-radios"
                       onChange={this.handleChangeFunction}
                     />
-                    Minimum area of compartment
+                    Minimum area of compartment (in square km)
                   </label>
                 </div>
                 <div className="custom-radios">
@@ -212,7 +212,7 @@ class Settings extends Component {
                     size="sm"
                     type="text"
                     id="forArea"
-                    placeholder="Provide minimum area of compartment..."
+                    placeholder="Provide minimum area of compartment (in square km)..."
                     onChange={this.handleTextInput}
                     value={areaValue && areaValue}
                   />

@@ -9,6 +9,10 @@ class MenuModal extends Component {
     this.state = {
       createUpload: false,
       elementHeight: 0,
+      firstList: false,
+      secondList: false,
+      fourthList: false,
+      fifthList: false,
     };
   }
 
@@ -34,8 +38,10 @@ class MenuModal extends Component {
       reader.onload = function loadReader() {
         function convertToLayer(buffer) {
           shp(buffer).then(function loadShapefile(geojson) {
-            console.log(geojson, 'buffer');
             getGeojsonData(geojson);
+            this.setState(() => ({
+              firstList: true,
+            }));
           });
         }
         if (reader.readyState !== 2 || reader.error) {
@@ -50,12 +56,13 @@ class MenuModal extends Component {
   };
 
   handleCsvData = (e) => {
-    this.setState((prevState) => ({
-      createUpload: !prevState.createUpload,
+    this.setState(() => ({
+      createUpload: false,
     }));
     const { getGeojsonCsvData } = this.props;
     let extensionFile = e.target.files[0].name.split('.');
     extensionFile = extensionFile[extensionFile.length - 1];
+    const that = this;
     if (extensionFile === 'csv') {
       const reader = new FileReader();
       reader.readAsText(e.target.files[0]);
@@ -63,6 +70,9 @@ class MenuModal extends Component {
         csv2geojson.csv2geojson(reader.result, function loadGeojson(err, data) {
           if (data.features.length) {
             getGeojsonCsvData(data);
+            that.setState(() => ({
+              secondList: true,
+            }));
           }
         });
       };
@@ -77,9 +87,41 @@ class MenuModal extends Component {
     handleSettings();
   };
 
+  handleGenerateCompartment = () => {
+    const { generateCompartment } = this.props;
+    generateCompartment();
+    this.setState(() => ({
+      fourthList: true,
+    }));
+  };
+
+  handleCreateClick = () => {
+    const { createPolygon } = this.props;
+    createPolygon();
+    this.setState(() => ({
+      createUpload: false,
+      firstList: true,
+    }));
+  };
+
+  resetDatas = () => {
+    const { callResetFunction } = this.props;
+    this.setState(() => ({
+      createUpload: false,
+    }));
+    callResetFunction();
+  };
+
+  generateFireLines = () => {
+    console.log('firelines Generated');
+    this.setState(() => ({
+      fifthList: true,
+    }));
+  };
+
   render() {
-    const { menuRef, handleCloseFunction } = this.props;
-    const { createUpload, elementHeight } = this.state;
+    const { menuRef, handleCloseFunction, firstListProps, allDatas } = this.props;
+    const { createUpload, elementHeight, firstList, secondList, fourthList, fifthList } = this.state;
     return (
       <div className="menu-container">
         <div className="menu" ref={menuRef}>
@@ -89,12 +131,14 @@ class MenuModal extends Component {
               <li role="presentation" onClick={this.handleClick}>
                 1. Create / Upload Forest Area (Shapefile)
               </li>
+              {(firstList || firstListProps) && <i className="material-icons icons-checked">check_circle</i>}
               <span>
                 <i className="material-icons">keyboard_backspace</i>
               </span>
               <li role="presentation" onClick={() => document.getElementById('CsvUpload').click()}>
                 2. Upload Survey Data (CSV)
               </li>
+              {secondList && <i className="material-icons icons-checked">check_circle</i>}
               <input
                 id="CsvUpload"
                 accept=".csv"
@@ -108,14 +152,27 @@ class MenuModal extends Component {
               <li role="presentation" onClick={this.handleRequirement}>
                 3. Fill your Requirements
               </li>
+              {allDatas && <i className="material-icons icons-checked">check_circle</i>}
               <span>
                 <i className="material-icons">keyboard_backspace</i>
               </span>
-              <li>4. Generate Forest Management Plans</li>
+              <li role="presentation" onClick={this.handleGenerateCompartment}>
+                4. Generate Compartments
+              </li>
+              {fourthList && <i className="material-icons icons-checked">check_circle</i>}
+              <span>
+                <i className="material-icons">keyboard_backspace</i>
+              </span>
+              <li role="presentation" onClick={this.generateFireLines}>
+                5. Generate Firelines
+              </li>
+              {fifthList && <i className="material-icons icons-checked">check_circle</i>}
             </ul>
           </div>
-          <div className="menu-footer-left">
-            <button type="button">RESET</button>
+          <div className="menu-footer-left" style={{ display: 'none' }}>
+            <button type="button" id="resetDatas" onClick={this.resetDatas}>
+              RESET
+            </button>
           </div>
           <div className="menu-footer-right">
             <button type="button" id="Menu" onClick={handleCloseFunction}>
@@ -126,7 +183,9 @@ class MenuModal extends Component {
         {createUpload && (
           <ul className="modal-menu-child" style={{ top: `${document.body.clientHeight - elementHeight}px` }}>
             <div>Do you want to create or upload shapefile?</div>
-            <li role="presentation">Create</li>
+            <li role="presentation" onClick={this.handleCreateClick}>
+              Create
+            </li>
             <li role="presentation" onClick={() => document.getElementById('fileUpload').click}>
               <label htmlFor="fileUpload">
                 <input
@@ -147,9 +206,14 @@ class MenuModal extends Component {
 }
 MenuModal.propTypes = {
   handleCloseFunction: PropTypes.func.isRequired,
+  firstListProps: PropTypes.bool.isRequired,
+  createPolygon: PropTypes.func.isRequired,
+  callResetFunction: PropTypes.func.isRequired,
+  generateCompartment: PropTypes.func.isRequired,
   handleSettings: PropTypes.func.isRequired,
   getGeojsonData: PropTypes.func.isRequired,
   getGeojsonCsvData: PropTypes.func.isRequired,
   menuRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.object })]).isRequired,
+  allDatas: PropTypes.oneOfType(PropTypes.object).isRequired,
 };
 export default MenuModal;

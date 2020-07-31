@@ -1,8 +1,9 @@
 .main-body {
   width: 100%;
-  height: 100%;
   .for-line {
     border-bottom: 1px solid black;
+    padding: 0;
+    margin: 0;
   }
   .main-wrapper {
     .left-icons-overlay {
@@ -45,7 +46,7 @@
     }
     .map-container {
       width: 100%;
-      height: calc(100vh - 80px);
+      height: calc(100vh - 75px);
     }
     .menu {
       position: relative;
@@ -85,6 +86,16 @@
             list-style: none;
             margin: 15px;
             padding: 6px;
+          }
+          .icons-checked {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            top: -38px;
+            right: 4px;
+            display: flex;
+            float: right;
+            color: green;
           }
           span {
             display: flex;

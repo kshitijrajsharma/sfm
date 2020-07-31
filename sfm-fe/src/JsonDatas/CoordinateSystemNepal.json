@@ -4,10 +4,6 @@
     "EPSG": "6207"
   },
   {
-    "name": "GCS Everest India Nepal",
-    "EPSG": "37203"
-  },
-  {
     "name": "WGS 84 / UTM zone 45N",
     "EPSG": "32645"
   },
@@ -17,7 +13,7 @@
   },
   {
     "name": "WGS 84",
-    "EPSG": "4979"
+    "EPSG": "4326"
   },
   {
     "name": "ITRF2014",

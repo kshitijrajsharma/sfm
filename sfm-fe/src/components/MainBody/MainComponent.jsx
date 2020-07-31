@@ -1,9 +1,11 @@
 import React, { Component, createRef } from 'react';
+import Axios from 'axios';
+import * as turf from '@turf/turf';
 import Map from './Map';
 import MenuModal from '../Models/MenuModal';
 import Settings from '../Models/Settings';
 import MainHeader from '../PageContents/MainHeader';
-import { regionDivided, postGeojsonData } from '../../constants';
+import { ROI_API } from '../../constants';
 
 class MainComponent extends Component {
   constructor(props) {
@@ -19,8 +21,21 @@ class MainComponent extends Component {
       geojsonCsvData: null,
       settingModal: false,
       allDatas: null,
+      createClicked: false,
+      generatePolygon: false,
+      allPolygonsData: [],
+      dataId: 0,
+      firstList: false,
     };
     this.menuRef = createRef();
+  }
+
+  componentDidMount() {
+    Axios.get(ROI_API).then((res) => {
+      this.setState(() => ({
+        allPolygonsData: res.data,
+      }));
+    });
   }
 
   handleMenuArrow = () => {
@@ -84,7 +99,6 @@ class MainComponent extends Component {
 
   handleChangeFunction = (e) => {
     const { id } = e.target;
-    console.log(id);
     this.setState(() => ({
       paramsMeasure: id,
     }));
@@ -99,16 +113,31 @@ class MainComponent extends Component {
   };
 
   getGeojsonData = (geojson) => {
-    const bodyFormData = new FormData();
-    bodyFormData.append('id', 2);
-    bodyFormData.append('idobjectid', 2);
-    bodyFormData.append('name', 'annapurna');
-    bodyFormData.append(
-      'geom',
-      `SRID=4326', ${geojson.features[0].geometry.type}((${geojson.features[0].geometry.coordinates}))`,
-    );
-
-    postGeojsonData(bodyFormData).then((res) => console.log(res));
+    const { allPolygonsData } = this.state;
+    const dataId = allPolygonsData.features.length + 1;
+    Axios.post(
+      ROI_API,
+      {
+        id: dataId,
+        type: geojson.features[0].type,
+        geometry: {
+          type: geojson.features[0].geometry.type,
+          coordinates: geojson.features[0].geometry.coordinates,
+        },
+        properties: {
+          objectid: dataId,
+          name: geojson.fileName,
+        },
+      },
+      { headers: { 'Content-Type': 'application/json' } },
+    )
+      .then((res) => {
+        this.setState(() => ({
+          allPolygonsData: res.data,
+          dataId,
+        }));
+      })
+      .catch((err) => console.log(err));
 
     this.setState(() => ({
       geojsonData: geojson,
@@ -128,21 +157,92 @@ class MainComponent extends Component {
   };
 
   handleSettingsData = (data) => {
-    const { numberValue, epsgSelected, areaValue } = data;
     this.setState(() => ({
       allDatas: data,
     }));
-    if (data && numberValue) {
-      regionDivided(numberValue, epsgSelected).then((response) => {
-        console.log(response);
-      });
-    } else if (data && areaValue) {
-      const totalArea = 100;
-      const number = (totalArea / areaValue).toFixed(0);
-      regionDivided(number, epsgSelected).then((response) => {
-        console.log(response);
-      });
+  };
+
+  generateCompartment = () => {
+    const { allDatas, geojsonData, dataId } = this.state;
+    const { numberValue, epsgSelected, areaValue } = allDatas;
+    if (dataId !== 0) {
+      if (allDatas && numberValue) {
+        Axios.get(`${ROI_API}${dataId}/${numberValue}/${epsgSelected}`).then((res) => {
+          this.setState(() => ({
+            geojsonClusters: res.data,
+          }));
+        });
+      } else if (allDatas && areaValue) {
+        const polygon = turf.polygon(geojsonData.features[0].geometry.coordinates);
+        const totalArea = turf.area(polygon) / (1000 * 1000);
+        const number = totalArea / areaValue;
+        let newNumber = 0;
+        if (number.toFixed(0) - number >= 0.5) {
+          newNumber = number.toFixed(0);
+        } else {
+          newNumber = number.toFixed(0) - 1;
+        }
+        Axios.get(`${ROI_API}${dataId}/${newNumber}/${epsgSelected}`).then((res) => {
+          this.setState(() => ({
+            geojsonClusters: res.data,
+          }));
+        });
+      }
+    } else {
+      console.log('required datas are not available');
     }
+  };
+
+  createPolygon = () => {
+    this.setState((prevState) => ({
+      createClicked: !prevState.createClicked,
+      generatePolygon: true,
+    }));
+  };
+
+  generateClose = (geojson) => {
+    const { allPolygonsData } = this.state;
+    const dataId = allPolygonsData.features.length + 1;
+    Axios.post(
+      ROI_API,
+      {
+        id: dataId,
+        type: geojson.type,
+        geometry: {
+          type: geojson.geometry.type,
+          coordinates: geojson.geometry.coordinates,
+        },
+        properties: {
+          objectid: dataId,
+          name: 'userCreatedLayer',
+        },
+      },
+      { headers: { 'Content-Type': 'application/json' } },
+    )
+      .then((res) => {
+        this.setState(() => ({
+          allPolygonsData: res.data,
+          dataId,
+        }));
+      })
+      .catch((err) => console.log(err));
+
+    this.setState(() => ({
+      geojsonData: geojson,
+      generatePolygon: false,
+      firstList: true,
+    }));
+  };
+
+  callResetFunction = () => {
+    this.setState(() => ({
+      dataId: 0,
+      geojsonData: null,
+      geojsonCsvData: null,
+      geojsonClusters: null,
+      generatePolygon: false,
+      allDatas: null,
+    }));
   };
 
   render() {
@@ -156,6 +256,10 @@ class MainComponent extends Component {
       settingModal,
       exportMap,
       allDatas,
+      geojsonClusters,
+      createClicked,
+      generatePolygon,
+      firstList,
     } = this.state;
     const OverlayItems = ['Legend', 'Measure', 'Export'];
 
@@ -174,6 +278,11 @@ class MainComponent extends Component {
             geojsonCsvData={geojsonCsvData}
             geojsonData={geojsonData}
             exportMap={exportMap}
+            geojsonClusters={geojsonClusters}
+            allDatas={allDatas}
+            createClicked={createClicked}
+            generatePolygon={generatePolygon}
+            generateClose={this.generateClose}
           />
           <div className="overlay-container-div">
             <ul className="overlay-list">
@@ -237,6 +346,11 @@ class MainComponent extends Component {
             handleCloseFunction={this.handleCloseFunction}
             getGeojsonCsvData={this.getGeojsonCsvData}
             handleSettings={this.handleSettings}
+            generateCompartment={this.generateCompartment}
+            createPolygon={this.createPolygon}
+            callResetFunction={this.callResetFunction}
+            firstListProps={firstList}
+            allDatas={allDatas}
           />
         )}
         {settingModal && (
